@@ -1,0 +1,15 @@
+[package]
+name = "wallpaper-manager-daemon"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+
+[dependencies]
+wallpaper-manager-ipc = { path = "../ipc", version = "*" }
+color-eyre = { version = "0.6.3", default-features = false }
+serde = { version = "1.0.203", features = ["derive", "rc"] }
+smithay-client-toolkit = { version = "0.19.1", default-features = false, features = [ "calloop" ] }
+serde_json = "1.0.118"
+clap = { version = "4.5.7", features = ["derive"] }

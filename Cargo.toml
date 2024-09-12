@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = ["cli", "daemon", "ipc"]
+default-members = ["cli"]
+
+[workspace.package]
+version = "0.1.0"
+description = "A simple Rust project using Nix"
+license-file = "LICENSE"
+authors = ["yunfachi <yunfachi@gmail.com>"]
+edition = "2021"
+rust-version = "1.75"

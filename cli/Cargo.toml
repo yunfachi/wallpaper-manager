@@ -1,0 +1,19 @@
+[package]
+name = "wallpaper-manager"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license-file.workspace = true
+
+[dependencies]
+wallpaper-manager-ipc = { path = "../ipc", version = "*" }
+wallpaper-manager-daemon = { path = "../daemon", version = "*" }
+clap = { version = "4.5.7", features = ["derive"] }
+serde = { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.118"
+
+[build-dependencies]
+wallpaper-manager-daemon = { path = "../daemon", version = "*" }
+clap = { version = "4.5.7", features = ["derive", "cargo"] }
+clap_complete = "4.5.6"
