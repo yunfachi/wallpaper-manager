@@ -44,11 +44,13 @@ pub fn handle_message(
 
     let message: IpcMessage = serde_json::from_slice(&buffer[..n])
         .with_context(|| format!("error while deserializing message {:?}", &buffer[..n]))?;
+    let mut should_stop = false;
 
     let resp: Result<IpcResponse, IpcError> = match message {
-        IpcMessage::StopDaemon { } => {
-            std::process::exit(0);
-        },
+        IpcMessage::StopDaemon { } => Ok({
+            should_stop = true;
+            IpcResponse::Ok
+        }),
         IpcMessage::PausePlay { } => Ok({
             if !wallpaper_manager.is_paused {
                 wallpaper_manager.is_paused = true;
@@ -123,8 +125,7 @@ pub fn handle_message(
 
                 (last_pause - last_update).as_millis() + last_resume.elapsed().as_millis()
             }
-        }),
-        
+        }),  
     };
 
     let mut stream = BufWriter::new(ustream);
@@ -133,5 +134,11 @@ pub fn handle_message(
         .context("unable to write response to the IPC client")
         .suggestion("Probably the client died, try running it again")?;
 
+    stream.flush()?;
+
+    if should_stop {
+        std::process::exit(0);
+    }
+    
     Ok(())
 }

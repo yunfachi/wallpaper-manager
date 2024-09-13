@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use xdg::{BaseDirectories, BaseDirectoriesError};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq)]
 pub enum IpcMessage {
     StopDaemon,
     PausePlay,
@@ -16,14 +16,14 @@ pub enum IpcMessage {
     CurrentInterval,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq)]
 pub enum IpcResponse {
     Ok,
     AllWallpapers { entries: Vec<PathBuf> },
     CurrentInterval { is_paused: bool, interval: u128, elapsed: u128 },
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum IpcError {
     PathNotAdded { path: PathBuf }
 }
