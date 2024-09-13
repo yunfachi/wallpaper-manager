@@ -9,6 +9,7 @@ pub struct WallpaperManager {
     pub dir: PathBuf,
     pub interval: Duration,
     pub wallpaper_daemon: WallpaperDaemon,
+    pub socket_path: PathBuf,
     pub is_paused: bool,
     pub last_update: Option<Instant>,
     pub last_pause: Option<Instant>,
@@ -19,11 +20,12 @@ pub struct WallpaperManager {
 }
 
 impl WallpaperManager {
-    pub fn new(dir: PathBuf, interval: Duration, wallpaper_daemon: WallpaperDaemon) -> Result<Self> {
+    pub fn new(dir: PathBuf, interval: Duration, wallpaper_daemon: WallpaperDaemon, socket_path: PathBuf) -> Result<Self> {
         Ok(Self {
             dir,
             interval,
             wallpaper_daemon,
+            socket_path,
             is_paused: false,
             last_update: None,
             last_pause: None,

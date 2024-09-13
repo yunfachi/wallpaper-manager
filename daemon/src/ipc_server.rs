@@ -137,6 +137,7 @@ pub fn handle_message(
     stream.flush()?;
 
     if should_stop {
+        std::fs::remove_file(wallpaper_manager.socket_path.clone()).expect("Unable to remove socket file");
         std::process::exit(0);
     }
     

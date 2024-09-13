@@ -21,7 +21,7 @@ use crate::wallpaper_manager::{WallpaperManager, WallpaperDaemon};
 
 pub fn run(dir: PathBuf, interval: u64, wallpaper_daemon: WallpaperDaemon) -> Result<()> {
     let mut event_loop = calloop::EventLoop::<WallpaperManager>::try_new()?;
-    let mut wallpaper_manager = WallpaperManager::new(dir.clone(), Duration::from_millis(interval), wallpaper_daemon)?;
+    let mut wallpaper_manager = WallpaperManager::new(dir.clone(), Duration::from_millis(interval), wallpaper_daemon, socket_path()?)?;
     
     wallpaper_manager.paths = std::fs::read_dir(dir.clone()).unwrap()
         .map(|res| res.map(|e| e.path()))
@@ -31,7 +31,7 @@ pub fn run(dir: PathBuf, interval: u64, wallpaper_daemon: WallpaperDaemon) -> Re
     let paths_length = wallpaper_manager.paths.len();
     println!("Total wallpapers: {}", paths_length);
 
-    let socket = listen_on_ipc_socket(&socket_path()?).context("spawning the ipc socket")?;
+    let socket = listen_on_ipc_socket(&wallpaper_manager.socket_path).context("spawning the ipc socket")?;
 
     event_loop
         .handle()
