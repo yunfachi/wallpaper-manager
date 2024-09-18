@@ -16,7 +16,22 @@ use crate::WallpaperManager;
 
 pub fn listen_on_ipc_socket(socket_path: &Path) -> Result<SocketSource> {
     if socket_path.exists() {
-        fs::remove_file(socket_path)?;
+        let mut conn = UnixStream::connect(socket_path);
+
+        if let Ok(mut conn) = conn {
+                conn.write_all(&serde_json::to_vec(&IpcMessage::StopDaemon {}).unwrap()).unwrap();
+                let mut buf = String::new();
+                conn.read_to_string(&mut buf).unwrap();
+                let res: Result<IpcResponse, IpcError> =
+                serde_json::from_str(&buf).expect("wallpaper-managers to return a valid json");
+                println!("The previous process was stopped via ipc: {}", buf);
+        }
+
+        // last resort
+        if socket_path.exists() {
+            fs::remove_file(socket_path)?;
+            println!("Connection refused, socket file was forcibly deleted");
+        }
     }
 
     let listener = UnixListener::bind(socket_path)?;
