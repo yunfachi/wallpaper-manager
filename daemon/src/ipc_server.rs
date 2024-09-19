@@ -16,14 +16,14 @@ use crate::WallpaperManager;
 
 pub fn listen_on_ipc_socket(socket_path: &Path) -> Result<SocketSource> {
     if socket_path.exists() {
-        let mut conn = UnixStream::connect(socket_path);
+        let conn = UnixStream::connect(socket_path);
 
         if let Ok(mut conn) = conn {
                 conn.write_all(&serde_json::to_vec(&IpcMessage::StopDaemon {}).unwrap()).unwrap();
                 let mut buf = String::new();
                 conn.read_to_string(&mut buf).unwrap();
-                let res: Result<IpcResponse, IpcError> =
-                serde_json::from_str(&buf).expect("wallpaper-managers to return a valid json");
+                let _res: Result<IpcResponse, IpcError> =
+                    serde_json::from_str(&buf).expect("wallpaper-managers to return a valid json");
                 println!("The previous process was stopped via ipc: {}", buf);
         }
 
@@ -82,13 +82,13 @@ pub fn handle_message(
         }),
         IpcMessage::NextWallpaper { } => Ok({
             wallpaper_manager.paths.rotate_left(1);
-            wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone());
+            wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone()).unwrap();
             wallpaper_manager.skip_after_manual = true;
             IpcResponse::Ok
         }),
         IpcMessage::PreviousWallpaper { } => Ok({
             wallpaper_manager.paths.rotate_right(1);
-            wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone());
+            wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone()).unwrap();
             wallpaper_manager.skip_after_manual = true;
             IpcResponse::Ok
         }),
@@ -98,7 +98,7 @@ pub fn handle_message(
                 wallpaper_manager.paths.insert(index, path);
 
                 if index == 0 || prev_index == 0 {
-                    wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone());
+                    wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone()).unwrap();
                     wallpaper_manager.skip_after_manual = true;
                 }
         
@@ -110,7 +110,7 @@ pub fn handle_message(
         IpcMessage::GoToWallpaper { path } => {
             if let Some(index) = wallpaper_manager.paths.iter().position(|x| x == &path) {
                 wallpaper_manager.paths.rotate_left(index);
-                wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone());
+                wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone()).unwrap();
                 wallpaper_manager.skip_after_manual = true;
         
                 Ok(IpcResponse::Ok)

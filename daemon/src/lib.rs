@@ -71,7 +71,7 @@ pub fn run(dir: PathBuf, interval: u64, wallpaper_daemon: WallpaperDaemon) -> Re
             }
 
             wallpaper_manager.paths.rotate_left(1);
-            wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone());
+            wallpaper_manager.set_wallpaper(wallpaper_manager.paths[0].clone()).unwrap();
 
             TimeoutAction::ToDuration(wallpaper_manager.interval)
         }).unwrap();
