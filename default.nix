@@ -5,11 +5,9 @@
 }:
 rustPlatform.buildRustPackage rec {
   pname = "wallpaper_manager";
-  version = "0.1.0";
+  version = (builtins.fromTOML (builtins.readFile ./Cargo.toml)).workspace.package.version;
 
   src = ./.;
-
-  nativeBuildInputs = [installShellFiles];
 
   cargoLock.lockFile = ./Cargo.lock;
 
@@ -20,11 +18,13 @@ rustPlatform.buildRustPackage rec {
       --zsh completions/_wallpaper-manager
   '';
 
+  nativeBuildInputs = [installShellFiles];
+
   meta = {
     description = "Daemon for unified interaction with wallpaper daemons";
     homepage = "https://github.com/yunfachi/wallpaper-manager";
     license = lib.licenses.gpl3Plus;
-    maintainers = with lib.maintainers; [yunfachi];
     mainProgram = "wallpaper-manager";
+    maintainers = with lib.maintainers; [yunfachi];
   };
 }
