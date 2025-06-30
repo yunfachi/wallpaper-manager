@@ -13,6 +13,7 @@ pub enum IpcMessage {
     MoveWallpaperToIndex { path: PathBuf, index: usize },
     GoToWallpaper { path: PathBuf },
     AllWallpapers,
+    CurrentWallpaper { watch: bool },
     CurrentInterval,
 }
 
@@ -20,6 +21,7 @@ pub enum IpcMessage {
 pub enum IpcResponse {
     Ok,
     AllWallpapers { entries: Vec<PathBuf> },
+    CurrentWallpaper { path: PathBuf },
     CurrentInterval { is_paused: bool, interval: u128, elapsed: u128 },
 }
 

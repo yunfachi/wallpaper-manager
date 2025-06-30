@@ -1,3 +1,4 @@
+use std::io::Write;
 use std::option::Option;
 use std::time::{Instant, Duration};
 use std::path::PathBuf;
@@ -5,6 +6,7 @@ use std::process::Command;
 use std::str;
 
 use color_eyre::Result;
+use wallpaper_manager_ipc::{IpcError, IpcResponse};
 
 pub struct WallpaperManager {
     #[allow(dead_code)]
@@ -19,6 +21,7 @@ pub struct WallpaperManager {
     pub paths: Vec<PathBuf>,
     pub waiting_after_pause: bool,
     pub skip_after_manual: bool,
+    pub watchers: Vec<std::os::unix::net::UnixStream>,
 }
 
 impl WallpaperManager {
@@ -40,6 +43,7 @@ impl WallpaperManager {
             paths: Vec::new(),
             waiting_after_pause: false,
             skip_after_manual: false,
+            watchers: Vec::new(),
         })
     }
 
@@ -48,6 +52,14 @@ impl WallpaperManager {
 
         let daemon = self.wallpaper_daemon.clone();
         let paths = self.paths.clone();
+
+        let resp: Result<IpcResponse, IpcError> = Ok(IpcResponse::CurrentWallpaper { path: path.clone() });
+        let mut json = serde_json::to_vec(&resp).unwrap();
+        json.push(b'\n');
+
+        self.watchers.retain_mut(|stream| {
+            stream.write_all(&json).is_ok()
+        });
 
         std::thread::spawn(move || {
             match daemon {

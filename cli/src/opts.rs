@@ -47,8 +47,13 @@ pub enum SubCmd {
         #[clap(short, long, required = true)]
         path: PathBuf,
     },
-    #[clap(visible_alias = "get-all")]
+    #[clap(visible_alias = "all")]
     AllWallpapers {},
-    #[clap(visible_alias = "get-interval")]
+    #[clap(visible_alias = "current")]
+    CurrentWallpaper {
+        #[clap(short, long)]
+        watch: bool,
+    },
+    #[clap(visible_alias = "interval")]
     CurrentInterval {},
 }

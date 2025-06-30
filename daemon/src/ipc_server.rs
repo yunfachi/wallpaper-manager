@@ -40,7 +40,7 @@ pub fn listen_on_ipc_socket(socket_path: &Path) -> Result<SocketSource> {
 }
 
 pub fn handle_message(
-    ustream: UnixStream,
+    mut ustream: UnixStream,
     wallpaper_manager: &mut WallpaperManager,
 ) -> Result<()> {
     const SIZE: usize = 4096;
@@ -55,7 +55,6 @@ pub fn handle_message(
         return Ok(());
     }
     ensure!(n != SIZE, "The message received was too big");
-
 
     let message: IpcMessage = serde_json::from_slice(&buffer[..n])
         .with_context(|| format!("error while deserializing message {:?}", &buffer[..n]))?;
@@ -121,6 +120,20 @@ pub fn handle_message(
         IpcMessage::AllWallpapers => Ok(IpcResponse::AllWallpapers {
             entries: wallpaper_manager.paths.clone()
         }),
+        IpcMessage::CurrentWallpaper { watch } => {
+            let path = wallpaper_manager.paths[0].clone();
+            if watch {
+                let resp: Result<IpcResponse, IpcError> = Ok(IpcResponse::CurrentWallpaper { path: path.clone() });
+                let mut json = serde_json::to_vec(&resp).unwrap();
+                json.push(b'\n');
+                ustream.write_all(&json).unwrap();
+                //ustream.flush()?;
+
+                wallpaper_manager.watchers.push(ustream);
+                return Ok(());
+            }
+            Ok(IpcResponse::CurrentWallpaper { path })
+        }
         IpcMessage::CurrentInterval => Ok(IpcResponse::CurrentInterval {
             is_paused: wallpaper_manager.is_paused,
             interval: wallpaper_manager.interval.as_millis(),
