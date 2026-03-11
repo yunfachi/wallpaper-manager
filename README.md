@@ -1,6 +1,6 @@
 # Wallpaper Manager Daemon
 
-A daemon for interaction with wallpaper daemons such as [swww](https://github.com/LGFae/swww) and [hyprpaper](https://github.com/hyprwm/hyprpaper), providing a unified system for wallpaper management and rotation.
+A daemon for interaction with wallpaper daemons such as [Swww](https://github.com/LGFae/swww), [Dank Material Shell](https://github.com/AvengeMedia/DankMaterialShell) and [Hyprpaper](https://github.com/hyprwm/hyprpaper), providing a unified system for wallpaper management and rotation.
 
 ## License
 

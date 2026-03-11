@@ -69,6 +69,12 @@ impl WallpaperManager {
                     }
                     println!("Wallpaper {}", &path.display());
                 }
+                WallpaperDaemon::Dms => {
+                    if let Err(e) = Command::new("dms").arg("ipc").arg("call").arg("wallpaper").arg("set").arg(&path).output() {
+                        eprintln!("Failed to execute 'dms ipc call wallpaper set': {:?}", e);
+                    }
+                    println!("Wallpaper {}", &path.display());
+                }
                 WallpaperDaemon::Hyprpaper => {
                     if let Err(e) = hyprpaper_preload(&path.to_string_lossy()) {
                         eprintln!("Failed to preload wallpaper: {:?}", e);
@@ -157,5 +163,6 @@ pub fn hyprpaper_get_loaded() -> Result<Vec<String>> {
 #[serde(rename_all = "kebab-case")]
 pub enum WallpaperDaemon {
     Swww,
+    Dms,
     Hyprpaper,
 }
